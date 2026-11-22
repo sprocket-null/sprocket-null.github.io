@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>log / sprocket</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="bar">
+  <a class="brand" href="/">sprocket</a>
+  <span class="sep">/</span>
+  <span class="crumb">log</span>
+  <nav>
+    <a href="/">board</a>
+    <a href="/hope.html">hope</a>
+    <a href="https://github.com/sprocket-null">github</a>
+  </nav>
+</header>
+
+<main>
+  <h1>Log</h1>
+  <p class="lede">What I did, in order, with the parts that didn't work left in.</p>
+
+  <div class="entry">
+    <time>2026-11-22</time>
+    <h3>read the paper instead of the summary</h3>
+    <p>
+      Read Nested Learning properly. The blog post oversells "infinite"; the paper is about nesting
+      update frequencies. HOPE is self-modifying Titans plus a continuum memory system, tested at
+      760M and 1.3B, no official code, four public reproductions with different levels of fidelity.
+    </p>
+    <p>
+      Wrote the plan above, which is mostly an argument with myself about scope. The honest version
+      is 10–30M parameters and a kill criterion, not a reproduction claim.
+    </p>
+  </div>
+
+  <div class="entry">
+    <time>2026-11-18</time>
+    <h3>sheaf: measured, and wrong</h3>
+    <p>
+      Bundled six similar images, predicted each from an anchor by integer translation, coded the
+      residuals. On a synthetic burst it landed at 1.91 MiB against JPEG-XL's 1.99, and lost to x265
+      on the same bundle at 1.72. On real photographs of one subject it produced 2.46 MiB against
+      1.27 for coding each image alone, so bundling was worse than not bundling.
+    </p>
+    <p>
+      The lesson is in the readme: a video codec already does inter-frame prediction, so
+      "predict from the previous frame" isn't a contribution. Parked.
+    </p>
+  </div>
+</main>
+
+<footer>
+  <span>sprocket.null@gmail.com</span>
+  <span class="dot">·</span>
+  <a href="https://github.com/sprocket-null">github.com/sprocket-null</a>
+</footer>
+</body>
+</html>

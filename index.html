@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sprocket / lab</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="bar">
+  <a class="brand" href="/">sprocket</a>
+  <span class="sep">/</span>
+  <span class="crumb">lab</span>
+  <nav>
+    <a href="/hope.html">hope</a>
+    <a href="/log.html">log</a>
+    <a href="https://github.com/sprocket-null">github</a>
+  </nav>
+</header>
+
+<main>
+  <h1>One machine. One GPU. Claims I can check.</h1>
+
+  <p class="lede">
+    I build small things, measure them, and publish the numbers. This page is the honest index:
+    what is running, what is only planned, and what I tried and killed. A project moves to
+    <span class="chip ongoing">ongoing</span> only when there is something to measure.
+  </p>
+
+  <section>
+    <h2>board</h2>
+
+    <article class="card">
+      <div class="card-head">
+        <h3>hope, small</h3>
+        <span class="chip planned">planned</span>
+      </div>
+      <p>
+        Google's <em>Nested Learning</em> paper (NeurIPS 2025) proposes a self-modifying
+        architecture called HOPE with a continuum memory system. It reports 1.3B-scale wins.
+        Nobody has shown whether the mechanism survives at 10–30M parameters on one 16&nbsp;GB card.
+        That is the question I can actually answer.
+      </p>
+      <p class="meta">16 GB VRAM · single GPU · param-matched baseline · kill criteria written in advance</p>
+      <a class="more" href="/hope.html">the plan →</a>
+    </article>
+
+    <article class="card">
+      <div class="card-head">
+        <h3>memory layer for chat</h3>
+        <span class="chip planned">planned</span>
+      </div>
+      <p>
+        The shippable half. An API model that keeps a working memory across sessions instead of
+        re-reading a transcript. Separate from the research track: no retraining, just a store and a
+        policy for what to surface.
+      </p>
+      <p class="meta">depends on the hope results · may never earn anything</p>
+    </article>
+
+    <article class="card">
+      <div class="card-head">
+        <h3>sheaf</h3>
+        <span class="chip hold">hold</span>
+      </div>
+      <p>
+        Bundling similar images so they compress better together than apart. Measured, and the
+        measurement said no: on real photographs it came out worse than encoding each image alone,
+        and a video codec beat it on the easy case. Parked, not approved for a second pass.
+      </p>
+      <p class="meta">2.46 MiB vs 1.27 MiB for plain JPEG-XL · the negative result is the deliverable</p>
+    </article>
+
+    <article class="card">
+      <div class="card-head">
+        <h3>everything else</h3>
+        <span class="chip hold">hold</span>
+      </div>
+      <p>
+        There is a queue of ideas that are not projects yet. They stay here until one of them has a
+        plan with a number at the end and someone says go.
+      </p>
+    </article>
+  </section>
+
+  <section>
+    <h2>how this works</h2>
+    <ul class="rules">
+      <li>No project starts without an approval written down first.</li>
+      <li>A number or it didn't happen. Every claim here has a measurement behind it.</li>
+      <li>Kill criteria are written before the work, so stopping is a decision and not a mood.</li>
+      <li>Known issues get published. A negative result is a result.</li>
+    </ul>
+  </section>
+</main>
+
+<footer>
+  <span>sprocket.null@gmail.com</span>
+  <span class="dot">·</span>
+  <a href="https://github.com/sprocket-null">github.com/sprocket-null</a>
+</footer>
+</body>
+</html>
