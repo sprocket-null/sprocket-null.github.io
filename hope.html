@@ -3,162 +3,141 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>hope, small / sprocket</title>
+<title>HOPE at scale / sprocket</title>
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-<header class="bar">
-  <a class="brand" href="/">sprocket</a>
-  <span class="sep">/</span>
-  <span class="crumb">hope</span>
+
+<div class="top">
+  <a href="/">sprocket</a>
   <nav>
-    <a href="/">board</a>
+    <a href="/">index</a>
     <a href="/log.html">log</a>
     <a href="https://github.com/sprocket-null">github</a>
   </nav>
-</header>
+</div>
 
-<main>
-  <h1>Does HOPE survive being small?</h1>
+<h1>Does HOPE's advantage grow with scale?</h1>
 
-  <p><span class="chip planned">planned</span></p>
+<p><span class="status">planned, no code written</span></p>
 
-  <p class="lede">
-    Google's Nested Learning paper reports a self-modifying architecture called HOPE that beats
-    Transformers at 760M and 1.3B parameters. Nobody has published whether the mechanism still pays
-    for itself at 10–30M parameters on a single 16&nbsp;GB card. That is a question I can afford to
-    answer, and it is the only claim I'm making.
-  </p>
+<p>
+  HOPE is an architecture from Google Research, published at NeurIPS 2025 in
+  <a href="https://arxiv.org/abs/2512.24695">Nested Learning: The Illusion of Deep Learning
+  Architectures</a>. It is two things stacked: a sequence model that learns its own update rule, and a
+  memory system made of blocks that update on different schedules, from very fast to very slow. The
+  authors report that it beats Transformers and modern recurrent models at 760M and 1.3B parameters.
+</p>
 
-  <h2>what the paper actually says</h2>
+<p>
+  The open question is not whether it works at one size. It is whether the advantage <em>persists</em>
+  as the model grows. Their own table is ambiguous about this, which is what makes it worth measuring.
+</p>
 
-  <p>
-    <em>Nested Learning: The Illusion of Deep Learning Architectures</em> (Behrouz, Razaviyayn, Zhong,
-    Mirrokni — NeurIPS 2025, <a href="https://arxiv.org/abs/2512.24695">arXiv:2512.24695</a>) argues
-    that architecture and optimizer are the same kind of object: a stack of nested optimization
-    problems, each with its own update frequency. Three pieces follow from that:
-  </p>
+<h2>What the paper's numbers actually show</h2>
 
-  <ul class="rules">
-    <li><strong>Deep optimizers.</strong> Momentum and Adam are associative memories compressing
-      gradients. Replace the dot-product objective with an L2 regression loss and you get a better
-      memory.</li>
-    <li><strong>Self-modifying Titans.</strong> A sequence model that learns its own update rule
-      rather than having one fixed by hand.</li>
-    <li><strong>Continuum Memory System (CMS).</strong> Instead of short-term vs long-term, a chain
-      of MLP blocks each updating on a different schedule: fast blocks adapt, slow blocks persist.
-      Knowledge can partially recover when it's forgotten.</li>
-  </ul>
+<table>
+  <tr><th>Model</th><th class="n">760M ppl</th><th class="n">1.3B ppl</th><th class="n">760M acc</th><th class="n">1.3B acc</th></tr>
+  <tr><td>Transformer++</td><td class="n">25.21</td><td class="n">18.53</td><td class="n">48.69</td><td class="n">52.25</td></tr>
+  <tr><td>HOPE</td><td class="n">20.53</td><td class="n">15.11</td><td class="n">52.26</td><td class="n">57.23</td></tr>
+  <tr><td>Gap</td><td class="n">4.68</td><td class="n">3.42</td><td class="n">3.57</td><td class="n">4.98</td></tr>
+</table>
 
-  <p>HOPE is self-modifying Titans plus CMS. The reported numbers, language modelling perplexity and
-  average commonsense accuracy:</p>
+<p>
+  Read the last row in both directions. On perplexity the gap narrows by 27% going from 760M to 1.3B,
+  which suggests the advantage shrinks as the baseline catches up. On downstream accuracy the gap
+  widens by 39%, which suggests the opposite. Two trends, one table, three times the compute between
+  the points. That is not enough data to tell whether HOPE is a scale story or a small-model story.
+</p>
 
-  <table>
-    <thead>
-      <tr><th>scale</th><th>model</th><th class="num">wiki ppl ↓</th><th class="num">avg acc ↑</th></tr>
-    </thead>
-    <tbody>
-      <tr><td>760M</td><td>Transformer++</td><td class="num">25.21</td><td class="num">48.69</td></tr>
-      <tr><td>760M</td><td>Titans</td><td class="num">20.04</td><td class="num">51.56</td></tr>
-      <tr><td>760M</td><td><strong>HOPE</strong></td><td class="num">20.53</td><td class="num">52.26</td></tr>
-      <tr><td>1.3B</td><td>Transformer++</td><td class="num">18.53</td><td class="num">52.25</td></tr>
-      <tr><td>1.3B</td><td><strong>HOPE</strong></td><td class="num">15.11</td><td class="num">57.23</td></tr>
-    </tbody>
-  </table>
+<h2>The experiment</h2>
 
-  <p class="meta">source: Table 1, NeurIPS 2025 camera-ready. 760M trained on 30B tokens, 1.3B on 100B.</p>
+<p>
+  Rather than argue about it, measure the slope. Train HOPE and a parameter-matched Transformer at
+  several sizes on the same data in the same order, with the same token budget per parameter, and fit
+  a line to the difference between them as a function of log parameters. If the line rises, the
+  mechanism scales. If it is flat or falls, it does not, at least in the range I can reach.
+</p>
 
-  <h2>what I think is wrong with the popular reading</h2>
+<table>
+  <tr><th>Rung</th><th class="n">params</th><th class="n">tokens</th><th class="n">est. GPU time</th></tr>
+  <tr><td>1</td><td class="n">40M</td><td class="n">0.8B</td><td class="n">~4 h</td></tr>
+  <tr><td>2</td><td class="n">130M</td><td class="n">2.6B</td><td class="n">~1.5 d</td></tr>
+  <tr><td>3</td><td class="n">400M</td><td class="n">8B</td><td class="n">~2 w</td></tr>
+</table>
 
-  <p>
-    "Infinite context, infinite reasoning" is not what this is. HOPE's unbounded thing is the number
-    of <em>learning levels</em> it can stack: the model can keep modifying its own update rule, so
-    continual learning doesn't have to end. Context is still finite; the CMS just makes long context
-    cheaper to hold. Reasoning is not infinite and the paper doesn't claim it is.
-  </p>
+<p>
+  Those times assume about 15 TFLOP/s sustained, which is a guess until measured on the actual card.
+  The rung sizes are provisional: I will fix them after a throughput benchmark, because publishing
+  estimates that turn out wrong is worse than publishing nothing. Two models at every rung, so double
+  the numbers above for the full experiment.
+</p>
 
-  <p>
-    That distinction matters, because it decides what to measure. If the claim were infinite context,
-    the benchmark would be needle-in-a-haystack at absurd lengths. Since the claim is continual
-    learning without catastrophic forgetting, the benchmark is a sequence of tasks where a normal
-    model decays and this one shouldn't.
-  </p>
+<p>
+  Memory is not the constraint here. 400M parameters in bf16 are 0.8&nbsp;GB; with fp32 master
+  weights, Adam state, gradients and activations the working set is under 12&nbsp;GB with gradient
+  checkpointing, and the 64&nbsp;GB of system RAM absorbs optimizer offload if it gets tight. Compute
+  is what costs, and the largest rung is the only one that is expensive.
+</p>
 
-  <h2>the gap I can actually fill</h2>
+<h2>What gets measured</h2>
 
-  <p>
-    The paper stops at 760M. There is no official code; at least four independent
-    mechanism-level reproductions exist, and none of them publish a compute-matched comparison at
-    small scale. Two things are unknown and cheap to test:
-  </p>
+<ol>
+  <li><strong>Language modelling perplexity</strong> on a held-out set, at every rung, both models.</li>
+  <li><strong>Long-context recall</strong>: needle-in-a-haystack at 2k, 4k and 8k, reported with the
+      extra compute the memory blocks consume, not just the accuracy.</li>
+  <li><strong>Forgetting</strong>: two tasks in sequence with no rehearsal. Measure task one before
+      and after task two. This is the claim the architecture is actually built for.</li>
+</ol>
 
-  <ol class="rules">
-    <li><strong>Does CMS beat a param-matched Transformer on long-context recall at equal compute?</strong>
-      Not equal tokens — equal wall-clock and equal memory. Multi-frequency blocks cost extra
-      updates per step, and papers usually report the win without the bill.</li>
-    <li><strong>Does the self-modifying block actually reduce forgetting in a task sequence?</strong>
-      Fine-tune task A then task B, no rehearsal, and measure A afterwards. That's the headline claim
-      and it's testable at 10M parameters.</li>
-  </ol>
+<p>
+  Three seeds at rung one, one seed at rungs two and three, because that is what the budget allows.
+  A result that only appears in one seed at one rung is not a result, and it will be reported as such.
+</p>
 
-  <h2>plan, if approved</h2>
+<h2>The decision rule, fixed now</h2>
 
-  <table>
-    <thead><tr><th>stage</th><th>what ships</th><th>how I know it worked</th></tr></thead>
-    <tbody>
-      <tr><td>1</td><td>CMS block + Transformer++ baseline, 10M params, small corpus, training runs end to end</td><td>baseline perplexity matches a known reference at that size</td></tr>
-      <tr><td>2</td><td>Self-modifying Titans block, same harness</td><td>trains without diverging at the paper's learning rates</td></tr>
-      <tr><td>3</td><td>NIAH at 2k / 4k / 8k, both models, equal compute budget</td><td>a curve, not a point, and the compute bill next to it</td></tr>
-      <tr><td>4</td><td>forgetting benchmark: two tasks in sequence, no rehearsal</td><td>retention delta, with error bars over seeds</td></tr>
-      <tr><td>5</td><td>writeup, code, reproduction script</td><td>someone else can run it in one command</td></tr>
-    </tbody>
-  </table>
+<p>
+  If the fitted slope of the accuracy gap is zero or negative across the three rungs, the mechanism
+  does not scale in the range tested and I will say so plainly, with the numbers, and stop. If it is
+  positive but smaller than seed noise at the top rung, the honest conclusion is "unresolved at this
+  scale", not "confirmed". Only a slope that is clearly positive across rungs justifies building the
+  chat product on top.
+</p>
 
-  <h2>kill criteria, written now</h2>
+<h2>What this is and is not</h2>
 
-  <blockquote>
-    If at matched parameters and matched compute HOPE gains under 2 points of NIAH accuracy and shows
-    no measurable retention advantage across three seeds, I publish the negative result and stop.
-    A small-scale "doesn't transfer" is a useful finding; dressing it up is not.
-  </blockquote>
+<p>
+  It is a scale-trend test between 40M and 400M parameters on a single consumer GPU. It is not a
+  reproduction of the paper's 1.3B results, and it will not settle the question for anyone training
+  at frontier scale. What it can do is resolve the contradiction in their own table, or show that the
+  contradiction is just noise from having two data points.
+</p>
 
-  <h2>hardware ceiling</h2>
+<p>
+  There is no official implementation. Several public reproductions exist, with different levels of
+  fidelity and at least one disagreement about the update rule; I have listed them below because I
+  will be checking my reading against theirs and saying where I diverge.
+</p>
 
-  <p>
-    One RTX 5070 Ti, 16&nbsp;GB. That caps this at tens of millions of parameters, a few hundred
-    million tokens, and days per run. It does not reproduce the paper. It tests whether the mechanism
-    is real at a size where I can run it three times and mean it.
-  </p>
+<h2>References</h2>
 
-  <h2>what this is not</h2>
-
-  <ul class="rules">
-    <li>Not a claim that I can train a frontier model. The gap between 30M and 1.3B is the whole story.</li>
-    <li>Not a product announcement. The chat-facing half is a separate track and may never work.</li>
-    <li>Not a reimplementation of Google's code, because there isn't any. It's my reading of the paper,
-      checked against the public reproductions where they disagree with me.</li>
-  </ul>
-
-  <h2>references</h2>
-
-  <ul class="rules">
-    <li>Behrouz et al., <a href="https://arxiv.org/abs/2512.24695">Nested Learning</a>, NeurIPS 2025.
-      <a href="https://research.google/blog/introducing-nested-learning-a-new-ml-paradigm-for-continual-learning/">Google Research blog</a>.</li>
-    <li>Titans: <em>Learning to Memorize at Test Time</em> — the architecture HOPE modifies.</li>
-    <li>Public reproductions I'll diff against:
-      <a href="https://github.com/kmccleary3301/nested_learning">kmccleary3301</a>,
-      <a href="https://github.com/erikl2/nested-learning">erikl2</a>,
-      <a href="https://github.com/engichang1467/Open-HOPE">Open-HOPE</a>,
-      <a href="https://github.com/DewashishCodes/Nested-Learning">DewashishCodes</a>.</li>
-  </ul>
-
-  <p class="meta">status: planned, no code written, awaiting approval.</p>
-</main>
+<ul>
+  <li>Behrouz, Razaviyayn, Zhong, Mirrokni. <a href="https://arxiv.org/abs/2512.24695">Nested
+      Learning: The Illusion of Deep Learning Architectures</a>. NeurIPS 2025.</li>
+  <li>Titans: Learning to Memorize at Test Time. The architecture HOPE modifies.</li>
+  <li>Public reproductions:
+    <a href="https://github.com/kmccleary3301/nested_learning">kmccleary3301</a>,
+    <a href="https://github.com/erikl2/nested-learning">erikl2</a>,
+    <a href="https://github.com/engichang1467/Open-HOPE">Open-HOPE</a>,
+    <a href="https://github.com/DewashishCodes/Nested-Learning">DewashishCodes</a>.</li>
+</ul>
 
 <footer>
-  <span>sprocket.null@gmail.com</span>
-  <span class="dot">·</span>
+  <a href="mailto:sprocket.null@gmail.com">sprocket.null@gmail.com</a>
+  <span class="sep">·</span>
   <a href="https://github.com/sprocket-null">github.com/sprocket-null</a>
 </footer>
+
 </body>
 </html>

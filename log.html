@@ -7,55 +7,57 @@
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-<header class="bar">
-  <a class="brand" href="/">sprocket</a>
-  <span class="sep">/</span>
-  <span class="crumb">log</span>
+
+<div class="top">
+  <a href="/">sprocket</a>
   <nav>
-    <a href="/">board</a>
+    <a href="/">index</a>
     <a href="/hope.html">hope</a>
     <a href="https://github.com/sprocket-null">github</a>
   </nav>
-</header>
+</div>
 
-<main>
-  <h1>Log</h1>
-  <p class="lede">What I did, in order, with the parts that didn't work left in.</p>
+<h1>Log</h1>
 
-  <div class="entry">
-    <time>2026-11-22</time>
-    <h3>read the paper instead of the summary</h3>
-    <p>
-      Read Nested Learning properly. The blog post oversells "infinite"; the paper is about nesting
-      update frequencies. HOPE is self-modifying Titans plus a continuum memory system, tested at
-      760M and 1.3B, no official code, four public reproductions with different levels of fidelity.
-    </p>
-    <p>
-      Wrote the plan above, which is mostly an argument with myself about scope. The honest version
-      is 10–30M parameters and a kill criterion, not a reproduction claim.
-    </p>
-  </div>
+<p>Short entries, in order. Things that did not work stay in.</p>
 
-  <div class="entry">
-    <time>2026-11-18</time>
-    <h3>sheaf: measured, and wrong</h3>
-    <p>
-      Bundled six similar images, predicted each from an anchor by integer translation, coded the
-      residuals. On a synthetic burst it landed at 1.91 MiB against JPEG-XL's 1.99, and lost to x265
-      on the same bundle at 1.72. On real photographs of one subject it produced 2.46 MiB against
-      1.27 for coding each image alone, so bundling was worse than not bundling.
-    </p>
-    <p>
-      The lesson is in the readme: a video codec already does inter-frame prediction, so
-      "predict from the previous frame" isn't a contribution. Parked.
-    </p>
-  </div>
-</main>
+<div class="entry">
+  <span class="status">2026-11-22</span>
+  <h3>Read the Nested Learning paper</h3>
+  <p>
+    Read the paper rather than the blog post. The architecture is a self-modifying sequence model
+    plus a memory system whose blocks update at different frequencies, and the reported results are
+    at 760M and 1.3B parameters. The blog oversells it as unbounded context; the paper is about
+    continual learning and update frequency, and context remains finite.
+  </p>
+  <p>
+    The thing I keep coming back to is that their own results point in two directions: the perplexity
+    advantage narrows with scale while the accuracy advantage widens. That is either a real crossover
+    or two points of noise, and it is cheap enough to test properly.
+  </p>
+</div>
+
+<div class="entry">
+  <span class="status">2026-11-18</span>
+  <h3>Image bundling: measured and rejected</h3>
+  <p>
+    Built a codec that predicts each image in a group from one anchor image, codes the difference,
+    and reconstructs exactly. On a synthetic burst it reached 1.91 MiB against 1.99 for independent
+    JPEG-XL, and lost to x265 on the same group at 1.72. On six real photographs of one subject it
+    produced 2.46 MiB where independent coding produced 1.27.
+  </p>
+  <p>
+    The mistake was not the implementation, it was the premise: a video codec already predicts across
+    frames, and one global translation is the wrong model for photographs taken from different
+    positions. The code is still in its repository, marked as parked.
+  </p>
+</div>
 
 <footer>
-  <span>sprocket.null@gmail.com</span>
-  <span class="dot">·</span>
+  <a href="mailto:sprocket.null@gmail.com">sprocket.null@gmail.com</a>
+  <span class="sep">·</span>
   <a href="https://github.com/sprocket-null">github.com/sprocket-null</a>
 </footer>
+
 </body>
 </html>
